@@ -1,0 +1,15 @@
+{
+  "plugins": ["node", "promise"],
+  "extends": [
+    "airbnb-base",
+    "plugin:node/recommended",
+    "plugin:promise/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "consistent-return": 0,
+    "no-console": 0,
+    "no-plusplus": 0,
+    "node/shebang": 0
+  }
+}

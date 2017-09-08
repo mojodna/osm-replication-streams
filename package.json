@@ -1,0 +1,36 @@
+{
+  "name": "osm-replication-streams",
+  "version": "0.0.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "prepublish": "babel -d dist src/"
+  },
+  "description": "",
+  "main": "dist/index.js",
+  "author": "Seth Fitzsimmons <seth@mojodna.net>",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.112.0",
+    "axios": "^0.16.2",
+    "buffertools": "^2.1.6",
+    "epipebomb": "^1.0.0",
+    "highland": "^2.11.1",
+    "js-yaml": "^3.9.1",
+    "osm2obj": "^2.2.2",
+    "stringify-stream": "^1.0.5",
+    "util.promisify": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "eslint": "^4.6.1",
+    "eslint-config-airbnb-base": "^12.0.0",
+    "eslint-config-prettier": "^2.4.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0"
+  }
+}
