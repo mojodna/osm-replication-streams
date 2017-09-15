@@ -23,6 +23,8 @@ async function getChange(sequence, { baseURL }) {
     responseType: "stream"
   });
 
+  rsp.data.sequenceNumber = sequence;
+
   return rsp.data;
 }
 
@@ -71,7 +73,13 @@ module.exports = options => {
       return push(null, _.nil);
     }
   })
-    .map(s => s.pipe(zlib.createUnzip()))
-    .map(s => _(s).append("\u001e"))
+    .map(s => {
+      // propagate sequence number
+      const s2 = s.pipe(zlib.createUnzip());
+      s2.sequenceNumber = s.sequenceNumber;
+
+      return s2;
+    })
+    .map(s => _(s).append(`<!-- sequenceNumber: ${s.sequenceNumber} -->\n`).append("\u001e"))
     .sequence();
 };
