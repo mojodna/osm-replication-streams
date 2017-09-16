@@ -5,7 +5,8 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "prepublish": "babel -d dist src/"
+    "build": "babel -d dist src/",
+    "prepublish": "npm run build"
   },
   "description": "",
   "main": "dist/index.js",
