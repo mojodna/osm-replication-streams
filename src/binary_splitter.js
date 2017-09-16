@@ -1,7 +1,5 @@
 const { Transform } = require("stream");
 
-const buffertools = require("buffertools");
-
 class BinarySplitter extends Transform {
   constructor(delimiter = "\n") {
     super();
@@ -23,7 +21,7 @@ class BinarySplitter extends Transform {
     let offset = 0;
 
     while (offset < buffer.length) {
-      const idx = buffertools.indexOf(buffer, this.delimiter, offset);
+      const idx = buffer.indexOf(this.delimiter, offset);
 
       if (idx < 0) {
         break;
