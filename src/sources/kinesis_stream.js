@@ -8,28 +8,33 @@ const describeStream = promisify(kinesis.describeStream.bind(kinesis));
 const getRecords = promisify(kinesis.getRecords.bind(kinesis));
 const getShardIterator = promisify(kinesis.getShardIterator.bind(kinesis));
 
-// TODO make me sync by delaying initialization
-module.exports = async options => {
+module.exports = options => {
   const opts = {
     // we only expect records every minute
     delay: 15e3,
     ...options
   };
 
-  const stream = await describeStream({
-    StreamName: opts.streamName
-  });
-
-  const { StreamDescription: { Shards: shards } } = stream;
-
-  let { ShardIterator: shardIterator } = await getShardIterator({
-    ShardId: shards[0].ShardId,
-    // TODO make me configurable
-    ShardIteratorType: "LATEST",
-    StreamName: opts.streamName
-  });
+  let shardIterator;
 
   return _(async (push, next) => {
+    const stream = await describeStream({
+      StreamName: opts.streamName
+    });
+
+    const { StreamDescription: { Shards: shards } } = stream;
+
+    if (shardIterator == null) {
+      const rsp = await getShardIterator({
+        ShardId: shards[0].ShardId,
+        // TODO make me configurable
+        ShardIteratorType: "LATEST",
+        StreamName: opts.streamName
+      });
+
+      shardIterator = rsp.ShardIterator;
+    }
+
     try {
       const rsp = await getRecords({
         ShardIterator: shardIterator
