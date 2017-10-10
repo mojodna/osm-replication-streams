@@ -11,7 +11,7 @@ const getMostRecentReplicationSequence = async ({ baseURL }) => {
 
     const matches = rsp.data.match(/sequenceNumber=(\d+)/);
 
-    return matches[1];
+    return parseInt(matches[1], 10);
   } catch (err) {
     throw err;
   }
@@ -41,9 +41,15 @@ module.exports = options => {
   let state = opts.initialSequence;
 
   return _(async (push, next) => {
-    if (state == null) {
+    if (state == null || state < 0) {
       try {
-        state = await getMostRecentReplicationSequence({ baseURL: opts.baseURL });
+        const nextState = await getMostRecentReplicationSequence({ baseURL: opts.baseURL });
+
+        if (state < 0) {
+          state += nextState;
+        } else {
+          state = nextState;
+        }
       } catch (err) {
         return push(err, _.nil);
       }
