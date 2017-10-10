@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-// require("babel-polyfill");
-require("epipebomb")();
+require('epipebomb')();
 const osm2obj = require("osm2obj");
-const stringify = require("stringify-stream");
+const stringify = require("stringify-stream")
 
 const {
   BinarySplitter,
@@ -10,22 +9,17 @@ const {
   sources: { Changes }
 } = require("..");
 
-function main() {
-  const rs = Changes({
-    infinite: true,
+async function main() {
+  const rs = await Changes({
+    // infinite: true,
     checkpoint: sequenceNumber => console.warn(`${sequenceNumber} fetched.`)
   });
 
   // rs.pipe(process.stdout);
-  rs
-    .pipe(
-      osm2obj({
-        coerceIds: false
-      })
-    )
-    .pipe(stringify())
-    .pipe(process.stdout);
-  // rs.pipe(new BinarySplitter("\u001e")).pipe(new KinesisStream("changes-xml"))
+  // rs.pipe(Osm2Json()).pipe(stringify()).pipe(process.stdout);
+  rs.pipe(new BinarySplitter("\u001e")).pipe(new Kinesis("changes-xml"))
+
+  rs.on("finish", () => console.log("done"))
 
   // TODO when writing to kinesis, make sure that elements are ordered such that they don't depend on entities that haven't been flushed
 }
