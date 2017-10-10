@@ -5,11 +5,11 @@ const AWS = require("aws-sdk");
 const kinesis = new AWS.Kinesis();
 
 class KinesisStream extends Writable {
-  constructor(streamName, partitionKey = "a") {
+  constructor(streamName, partitionKey = null) {
     super();
 
     this.streamName = streamName;
-    this.partitionKey = partitionKey;
+    this.partitionKey = partitionKey || streamName;
   }
 
   _write(chunk, encoding, callback) {
