@@ -12,7 +12,9 @@ class KinesisStream extends Writable {
     this.partitionKey = partitionKey || streamName;
   }
 
+  // TODO implement _writev for batch writes
   _write(chunk, encoding, callback) {
+    // TODO check chunk size to ensure that it's < 1MB
     return kinesis.putRecord(
       {
         Data: chunk,

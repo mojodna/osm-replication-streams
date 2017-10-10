@@ -8,6 +8,7 @@ const describeStream = promisify(kinesis.describeStream.bind(kinesis));
 const getRecords = promisify(kinesis.getRecords.bind(kinesis));
 const getShardIterator = promisify(kinesis.getShardIterator.bind(kinesis));
 
+// TODO make me sync by delaying initialization
 module.exports = async options => {
   const opts = {
     // we only expect records every minute
