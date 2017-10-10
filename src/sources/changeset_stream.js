@@ -61,7 +61,7 @@ module.exports = options => {
 
       push(null, change);
 
-      options.checkpoint(state);
+      opts.checkpoint(state);
 
       state++;
 
