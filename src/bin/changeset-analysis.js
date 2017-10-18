@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { PassThrough, Writable } = require("stream");
+const { PassThrough, Transform } = require("stream");
 
 require("epipebomb")();
 const LRU = require("lru-cache");
@@ -33,6 +33,10 @@ setInterval(() => {
   console.log("Cache size: %s (%s)", cache.itemCount.toLocaleString(), prettyBytes(cache.length));
 }, 60e3).unref();
 
+let isInterestingChangeset = (changeset, hashtags) => hashtags != null;
+
+// isInterestingChangeset = () => true;
+
 const processChangeset = (changeset, callback) => {
   // TODO remap users if necessary
   // TODO track edits by editor type
@@ -43,24 +47,30 @@ const processChangeset = (changeset, callback) => {
     uid,
     user,
   } = changeset;
-  let { tags: { hashtags, imagery_used } } = changeset;
+
+  let { closed_at, created_at, tags: { hashtags, imagery_used } } = changeset;
+  closed_at = new Date(closed_at);
+  created_at = new Date(created_at);
 
   const key = `changeset-elements:${id}`;
   // track the most recent changeset id so we can avoid caching elements older
   // than it that we're not watching
   lastChangeset = Math.max(lastChangeset, id);
 
+  // TODO and created_at >= iD 2.4.3 release date
   if (hashtags != null) {
     hashtags = Array.from(new Set(hashtags.split(";").map(x => x.trim())));
   } else if (comment != null) {
     hashtags = Array.from(new Set(comment.match(/(#[^\u2000-\u206F\u2E00-\u2E7F\s\\'!"#$%()*,./:;<=>?@[\]^`{|}~]+)/g)));
+  } else {
+    hashtags = [];
   }
 
   if (imagery_used != null) {
     imagery_used = imagery_used.split(";").map(x => x.trim());
   }
 
-  if (hashtags == null) {
+  if (!isInterestingChangeset(changeset, hashtags)) {
     // clear out cached items associated with this changeset; not needed since
     // we don't care about it
     cache.del(key);
@@ -181,6 +191,7 @@ const processElement = (element, callback) => {
 
     case "changeset":
       try {
+        console.log(element);
         return processChangeset(element, callback);
       } catch (err) {
         console.error(err.stack);
@@ -193,39 +204,44 @@ const processElement = (element, callback) => {
   }
 };
 
-const analyzer = new Writable({
+const analyzer = new Transform({
   objectMode: true,
 });
 
 analyzer._write = (obj, _, callback) => {
-  // console.log(obj);
-  processElement(obj, callback);
+  process.stderr.write(JSON.stringify(obj))
+  return callback();
+  // processElement(obj, callback);
 };
 
 analyzer._writev = (objs, _, callback) => {
   console.log("objs:", objs);
+  process.exit();
 
   return callback();
 };
 
 const changesets = Changesets({
-  infinite: true,
-  initialSequence: -5,
+  infinite: false,
+  initialSequence: -60, // 2580891
+  checkpoint: sequenceNumber => console.log(`changeset sequence ${sequenceNumber} fetched.`)
 }).pipe(osm2obj());
 
 const changes = Changes({
-  infinite: true,
-  initialSequence: -10,
+  infinite: false,
+  initialSequence: -60, // 2660244
+  checkpoint: sequenceNumber => console.log(`change sequence ${sequenceNumber} fetched.`)
 }).pipe(osm2obj());
 
 const merge = new PassThrough({
   objectMode: true,
 }).pipe(analyzer);
 
-// changesets.pipe(merge);
-setTimeout(() => changesets.pipe(merge), 30e3);
+changesets.pipe(merge);
+// setTimeout(() => changesets.pipe(merge), 30e3);
 
 // wait 30s to start reading changes so that the watch list can be populated
-setTimeout(() => changes.pipe(merge), 0);
+changes.pipe(merge);
+// setTimeout(() => changes.pipe(merge), 0);
 
 // changesets.pipe(stringify()).pipe(process.stdout);

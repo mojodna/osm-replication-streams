@@ -1,5 +1,9 @@
 {
   "plugins": ["node", "promise"],
+  "env": {
+    "jest": true,
+    "node": true
+  },
   "extends": [
     "airbnb-base",
     "plugin:node/recommended",
@@ -8,7 +12,10 @@
   ],
   "rules": {
     "consistent-return": 0,
+    "class-methods-use-this": 0,
+    "global-require": 0,
     "no-console": 0,
+    "no-param-reassign": 0,
     "no-plusplus": 0,
     "node/shebang": 0
   }
