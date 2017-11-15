@@ -7,7 +7,9 @@ const CONCURRENCY = 128;
 
 class EventHub extends Writable {
   constructor(connectionString, path = null) {
-    super();
+    super({
+      objectMode: true
+    });
 
     this.client = Client.fromConnectionString(connectionString, path);
     this.sender = null;
@@ -30,7 +32,7 @@ class EventHub extends Writable {
     return this.sender;
   }
 
-  _write(chunk, encoding, callback) {
+  _write(obj, _, callback) {
     this.pending++;
 
     let blind = false;
@@ -43,7 +45,7 @@ class EventHub extends Writable {
 
     return (
       this.connect()
-        .then(sender => sender.send(chunk.toString()))
+        .then(sender => sender.send(obj))
         // callback if this wasn't submitted blindly
         .then(() => blind || callback())
         .catch(callback)
