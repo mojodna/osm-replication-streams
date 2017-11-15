@@ -3,6 +3,7 @@ const EventHubSink = require("./sinks/event_hub");
 const KinesisSink = require("./sinks/kinesis_stream");
 const Changes = require("./sources/change_stream");
 const Changesets = require("./sources/changeset_stream");
+const EventHubSource = require("./sources/event_hub");
 const KinesisSource = require("./sources/kinesis_stream");
 
 module.exports = {
@@ -14,6 +15,7 @@ module.exports = {
   sources: {
     Changes,
     Changesets,
+    EventHub: EventHubSource,
     Kinesis: KinesisSource
   }
 }
