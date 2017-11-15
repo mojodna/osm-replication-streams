@@ -48,7 +48,7 @@ class EventHub extends Writable {
         .then(sender => sender.send(obj))
         // callback if this wasn't submitted blindly
         .then(() => blind || callback())
-        .catch(callback)
+        .catch(err => blind ? this.emit(err) : callback(err))
         .then(() => this.pending--)
     );
   }
