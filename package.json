@@ -13,8 +13,10 @@
   "author": "Seth Fitzsimmons <seth@mojodna.net>",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.6.0",
     "aws-sdk": "^2.112.0",
     "axios": "^0.16.2",
+    "azure-event-hubs": "0.0.8",
     "epipebomb": "^1.0.0",
     "highland": "^2.11.1",
     "js-yaml": "^3.9.1",
