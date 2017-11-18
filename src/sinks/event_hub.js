@@ -2,8 +2,12 @@ const { Writable } = require("stream");
 
 const async = require("async");
 const { Client } = require("azure-event-hubs");
+const promiseRetry = require("promise-retry");
 
 const CONCURRENCY = 128;
+
+/* eslint-disable promise/avoid-new */
+const wait = () => new Promise(resolve => setImmediate(resolve));
 
 class EventHub extends Writable {
   constructor(connectionString, path = null) {
@@ -11,23 +15,39 @@ class EventHub extends Writable {
       objectMode: true
     });
 
-    this.client = Client.fromConnectionString(connectionString, path);
+    this.connectionString = connectionString;
+    this.path = path;
     this.sender = null;
     this.pending = 0;
+    this.connecting = false;
   }
 
   async connect() {
-    if (this.sender != null) {
+    while (this.connecting) {
+      /* eslint-disable no-await-in-loop */
+      await wait();
+    }
+
+    /* eslint-disable no-underscore-dangle */
+    if (this.sender != null && this.sender._senderLink.canSend()) {
       return this.sender;
     }
 
-    await this.client.open();
+    this.connecting = true;
 
-    this.sender = await this.client.createSender();
+    const client = Client.fromConnectionString(
+      this.connectionString,
+      this.path
+    );
+    await client.open();
+
+    this.sender = await client.createSender();
 
     this.sender.on("errorReceived", err =>
       console.warn("sender error:", err.stack)
     );
+
+    this.connecting = false;
 
     return this.sender;
   }
@@ -44,11 +64,19 @@ class EventHub extends Writable {
     }
 
     return (
-      this.connect()
-        .then(sender => sender.send(obj))
+      promiseRetry(
+        {
+          retries: 2,
+          minTimeout: 0
+        },
+        retry =>
+          this.connect()
+            .then(sender => sender.send(obj))
+            .catch(err => this.connect().then(() => retry(err)))
+      )
         // callback if this wasn't submitted blindly
         .then(() => blind || callback())
-        .catch(err => blind ? this.emit(err) : callback(err))
+        .catch(err => (blind ? this.emit(err) : callback(err)))
         .then(() => this.pending--)
     );
   }
