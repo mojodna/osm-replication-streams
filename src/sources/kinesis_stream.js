@@ -26,6 +26,7 @@ module.exports = options => {
 
     if (shardIterator == null) {
       const rsp = await getShardIterator({
+        // TODO create ShardIterators for all shards
         ShardId: shards[0].ShardId,
         // TODO make me configurable
         ShardIteratorType: "LATEST",
