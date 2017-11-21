@@ -2,13 +2,13 @@ const { PassThrough } = require("stream");
 
 const { Client } = require("azure-event-hubs");
 
-const connect = async (client, output) => {
+const connect = async (client, consumerGroup, output) => {
   await client.open();
 
   const partitionIds = await client.getPartitionIds();
 
   partitionIds.forEach(async id => {
-    const receiver = await client.createReceiver("$Default", id, {
+    const receiver = await client.createReceiver(consumerGroup, id, {
       startAfterTime: Date.now()
     });
 
@@ -17,7 +17,7 @@ const connect = async (client, output) => {
   });
 };
 
-module.exports = (connectionString, path = null) => {
+module.exports = (connectionString, consumerGroup = "$Default", path = null) => {
   const client = Client.fromConnectionString(connectionString, path);
 
   const passThrough = new PassThrough({
@@ -25,7 +25,7 @@ module.exports = (connectionString, path = null) => {
   });
 
   client.open();
-  connect(client, passThrough);
+  connect(client, consumerGroup, passThrough);
 
   return passThrough;
 };
