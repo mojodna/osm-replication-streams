@@ -17,7 +17,7 @@ const connect = async (client, consumerGroup, output) => {
   });
 };
 
-module.exports = (connectionString, consumerGroup = "$Default", path = null) => {
+module.exports = (connectionString, path = null, consumerGroup = "$Default") => {
   const client = Client.fromConnectionString(connectionString, path);
 
   const passThrough = new PassThrough({
