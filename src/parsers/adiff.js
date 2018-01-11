@@ -297,8 +297,27 @@ module.exports = class AugmentedDiffParser extends Transform {
           );
         }
 
-        return lineString(
-          coords,
+        if (coords.length >= 2) {
+          return lineString(
+            coords,
+            {
+              changeset: element.changeset,
+              id: element.id,
+              tags: element.tags,
+              timestamp: element.timestamp,
+              type: element.type,
+              uid: element.uid,
+              user: element.user,
+              version: element.version
+            },
+            {
+              id
+            }
+          );
+        }
+
+        return point(
+          coords[0],
           {
             changeset: element.changeset,
             id: element.id,
