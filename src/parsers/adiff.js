@@ -260,6 +260,7 @@ module.exports = class AugmentedDiffParser extends Transform {
             id: element.id,
             tags: element.tags,
             timestamp: element.timestamp,
+            type: element.type,
             uid: element.uid,
             user: element.user,
             version: element.version
@@ -285,6 +286,7 @@ module.exports = class AugmentedDiffParser extends Transform {
               id: element.id,
               tags: element.tags,
               timestamp: element.timestamp,
+              type: element.type,
               uid: element.uid,
               user: element.user,
               version: element.version
@@ -302,6 +304,7 @@ module.exports = class AugmentedDiffParser extends Transform {
             id: element.id,
             tags: element.tags,
             timestamp: element.timestamp,
+            type: element.type,
             uid: element.uid,
             user: element.user,
             version: element.version
