@@ -12,6 +12,101 @@ const sax = require("sax");
 
 const isClosed = coords => isEqual(coords[0], coords[coords.length - 1]);
 
+const toGeoJSON = (id, element, prev) => {
+  switch (element.type) {
+    case "node": {
+      let coords = [element.lon, element.lat];
+
+      // use previous coords if the element has been deleted
+      if (element.lat == null && element.lon == null) {
+        coords = [prev.lon, prev.lat];
+      }
+
+      return point(
+        coords,
+        {
+          changeset: element.changeset,
+          id: element.id,
+          tags: element.tags,
+          timestamp: element.timestamp,
+          type: element.type,
+          uid: element.uid,
+          user: element.user,
+          version: element.version
+        },
+        {
+          id
+        }
+      );
+    }
+
+    case "way": {
+      let coords = element.nodes.map(x => [x.lon, x.lat]);
+
+      if (element.nodes.length === 0) {
+        coords = prev.nodes.map(x => [x.lon, x.lat]);
+      }
+
+      if (isClosed(coords) && isArea(element.tags) && coords.length >= 4) {
+        return polygon(
+          [coords],
+          {
+            changeset: element.changeset,
+            id: element.id,
+            tags: element.tags,
+            timestamp: element.timestamp,
+            type: element.type,
+            uid: element.uid,
+            user: element.user,
+            version: element.version
+          },
+          {
+            id
+          }
+        );
+      }
+
+      if (coords.length >= 2) {
+        return lineString(
+          coords,
+          {
+            changeset: element.changeset,
+            id: element.id,
+            tags: element.tags,
+            timestamp: element.timestamp,
+            type: element.type,
+            uid: element.uid,
+            user: element.user,
+            version: element.version
+          },
+          {
+            id
+          }
+        );
+      }
+
+      return point(
+        coords[0],
+        {
+          changeset: element.changeset,
+          id: element.id,
+          tags: element.tags,
+          timestamp: element.timestamp,
+          type: element.type,
+          uid: element.uid,
+          user: element.user,
+          version: element.version
+        },
+        {
+          id
+        }
+      );
+    }
+
+    default:
+  }
+};
+
 module.exports = class AugmentedDiffParser extends Transform {
   constructor() {
     super({
@@ -161,7 +256,7 @@ module.exports = class AugmentedDiffParser extends Transform {
         if (["node", "way"].includes(next.type)) {
           if (prev == null) {
             if (Object.keys(next.tags).length > 0) {
-              const ng = this.toGeoJSON("new", next);
+              const ng = toGeoJSON("new", next);
 
               this.push(
                 featureCollection([ng], {
@@ -200,8 +295,8 @@ module.exports = class AugmentedDiffParser extends Transform {
               Object.keys(prev.tags).length > 0 ||
               Object.keys(next.tags).length > 0
             ) {
-              const og = this.toGeoJSON("old", prev);
-              const ng = this.toGeoJSON("new", next, prev);
+              const og = toGeoJSON("old", prev);
+              const ng = toGeoJSON("new", next, prev);
 
               this.push(
                 featureCollection([og, ng], {
@@ -237,101 +332,6 @@ module.exports = class AugmentedDiffParser extends Transform {
         }
 
         break;
-      }
-
-      default:
-    }
-  }
-
-  toGeoJSON(id, element, prev) {
-    switch (element.type) {
-      case "node": {
-        let coords = [element.lon, element.lat];
-
-        // use previous coords if the element has been deleted
-        if (element.lat == null && element.lon == null) {
-          coords = [prev.lon, prev.lat];
-        }
-
-        return point(
-          coords,
-          {
-            changeset: element.changeset,
-            id: element.id,
-            tags: element.tags,
-            timestamp: element.timestamp,
-            type: element.type,
-            uid: element.uid,
-            user: element.user,
-            version: element.version
-          },
-          {
-            id
-          }
-        );
-      }
-
-      case "way": {
-        let coords = element.nodes.map(x => [x.lon, x.lat]);
-
-        if (element.nodes.length === 0) {
-          coords = prev.nodes.map(x => [x.lon, x.lat]);
-        }
-
-        if (isClosed(coords) && isArea(element.tags) && coords.length >= 4) {
-          return polygon(
-            [coords],
-            {
-              changeset: element.changeset,
-              id: element.id,
-              tags: element.tags,
-              timestamp: element.timestamp,
-              type: element.type,
-              uid: element.uid,
-              user: element.user,
-              version: element.version
-            },
-            {
-              id
-            }
-          );
-        }
-
-        if (coords.length >= 2) {
-          return lineString(
-            coords,
-            {
-              changeset: element.changeset,
-              id: element.id,
-              tags: element.tags,
-              timestamp: element.timestamp,
-              type: element.type,
-              uid: element.uid,
-              user: element.user,
-              version: element.version
-            },
-            {
-              id
-            }
-          );
-        }
-
-        return point(
-          coords[0],
-          {
-            changeset: element.changeset,
-            id: element.id,
-            tags: element.tags,
-            timestamp: element.timestamp,
-            type: element.type,
-            uid: element.uid,
-            user: element.user,
-            version: element.version
-          },
-          {
-            id
-          }
-        );
       }
 
       default:
