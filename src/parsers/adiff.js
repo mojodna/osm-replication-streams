@@ -128,7 +128,8 @@ module.exports = class AugmentedDiffParser extends Transform {
       xmlMode: true
     })
 
-    // write a synthetic root element to facilitate parsing of multiple documents
+    // write a synthetic root element to facilitate parsing of multiple
+    // documents
     this.parser.write("<root>");
   }
 
