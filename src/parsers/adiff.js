@@ -6,9 +6,9 @@ const {
   point,
   polygon
 } = require("@turf/helpers");
+const { Parser } = require("htmlparser2");
 const { isArea } = require("id-area-keys");
 const isEqual = require("lodash.isequal");
-const sax = require("sax");
 
 const isClosed = coords => isEqual(coords[0], coords[coords.length - 1]);
 
@@ -120,14 +120,13 @@ module.exports = class AugmentedDiffParser extends Transform {
   }
 
   createParser() {
-    this.parser = sax.createStream(false, {
-      lowercase: true
-    });
-    this.parser.on("opentag", this.startElement.bind(this));
-    this.parser.on("closetag", this.endElement.bind(this));
-    this.parser.on("error", err => {
-      this.emit("error", err);
-    });
+    this.parser = new Parser({
+      onopentag: this.startElement.bind(this),
+      onclosetag: this.endElement.bind(this),
+      onerror: err => this.emit("error", err)
+    }, {
+      xmlMode: true
+    })
 
     // write a synthetic root element to facilitate parsing of multiple documents
     this.parser.write("<root>");
@@ -139,7 +138,7 @@ module.exports = class AugmentedDiffParser extends Transform {
     return callback();
   }
 
-  startElement({ name, attributes }) {
+  startElement(name, attributes) {
     switch (name) {
       case "osm":
         this.nodes = {
