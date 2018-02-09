@@ -22,7 +22,7 @@
     "highland": "^2.11.1",
     "htmlparser2": "^3.9.2",
     "id-area-keys": "^2.5.0",
-    "js-yaml": "^3.9.1",
+    "js-yaml": "^3.10.0",
     "lodash.isequal": "^4.5.0",
     "osm2obj": "^2.2.2",
     "promise-retry": "^1.1.1",

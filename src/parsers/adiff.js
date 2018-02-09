@@ -9,6 +9,7 @@ const {
 const { Parser } = require("htmlparser2");
 const { isArea } = require("id-area-keys");
 const isEqual = require("lodash.isequal");
+const yaml = require("js-yaml");
 
 const isClosed = coords => isEqual(coords[0], coords[coords.length - 1]);
 
@@ -113,20 +114,47 @@ module.exports = class AugmentedDiffParser extends Transform {
       readableObjectMode: true
     });
 
-    this.batch = [];
-    this.currentTimestamp = 0;
+    this.sequence = null;
 
     this.createParser();
   }
 
   createParser() {
-    this.parser = new Parser({
-      onopentag: this.startElement.bind(this),
-      onclosetag: this.endElement.bind(this),
-      onerror: err => this.emit("error", err)
-    }, {
-      xmlMode: true
-    })
+    this.parser = new Parser(
+      {
+        onopentag: this.startElement.bind(this),
+        onclosetag: this.endElement.bind(this),
+        oncomment: comment => {
+          try {
+            const data = yaml.safeLoad(comment);
+            console.log("comment:", data);
+
+            if (data.status === "start") {
+              this.sequence = data.sequenceNumber;
+              this.emit("sequenceStart", this.sequence);
+            }
+
+            if (data.status === "end") {
+              this.emit("sequenceEnd", this.sequence);
+              this.parser.reset();
+              this.sequence = null;
+            }
+
+            // push a marker into the stream
+            this.push({
+              type: "Marker",
+              properties: data
+            });
+          } catch (err) {
+            // not yaml
+          }
+        },
+        onerror: err => console.warn(err) && this.emit("error", err)
+      },
+      {
+        xmlMode: true
+      }
+    );
 
     // write a synthetic root element to facilitate parsing of multiple
     // documents
@@ -257,6 +285,7 @@ module.exports = class AugmentedDiffParser extends Transform {
           if (prev == null) {
             if (Object.keys(next.tags).length > 0) {
               const ng = toGeoJSON("new", next);
+              ng.properties.augmentedDiff = this.sequence;
 
               this.push(
                 featureCollection([ng], {
@@ -297,6 +326,7 @@ module.exports = class AugmentedDiffParser extends Transform {
             ) {
               const og = toGeoJSON("old", prev);
               const ng = toGeoJSON("new", next, prev);
+              ng.properties.augmentedDiff = this.sequence;
 
               this.push(
                 featureCollection([og, ng], {

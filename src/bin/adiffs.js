@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 require("epipebomb")();
-const osm2obj = require("osm2obj");
 const stringify = require("stringify-stream");
 
 process.on("unhandledRejection", err => {
@@ -13,15 +12,20 @@ const {
   sources: { AugmentedDiffs }
 } = require("..");
 
+const checkpoint = sequenceNumber => console.warn(`${sequenceNumber} fetched.`);
+
 const rs = AugmentedDiffs({
   infinite: true,
-  // initialSequence: 2801986,
-  checkpoint: sequenceNumber => console.warn(`${sequenceNumber} fetched.`)
+  initialSequence: 2813055
 });
+
+const processor = new AugmentedDiffParser()
+  .on("error", console.warn)
+  .on("sequenceEnd", checkpoint);
 
 // process.stdin
 rs
-  .pipe(new AugmentedDiffParser().on("error", err => console.warn(err)))
+  .pipe(processor)
   .pipe(stringify())
   .pipe(process.stdout);
 // rs

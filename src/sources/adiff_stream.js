@@ -1,18 +1,19 @@
 const _ = require("highland");
 const axios = require("axios");
+const yaml = require("js-yaml");
 
 const OVERPASS_URL = "http://overpass-api.de";
 
-
 const getMostRecentReplicationSequence = async ({ baseURL }) => {
-  const rsp = await axios.get(`${baseURL}/api/augmented_diff_status`)
+  const rsp = await axios.get(`${baseURL}/api/augmented_diff_status`);
 
   return parseInt(rsp.data, 10);
 };
 
 async function getChange(sequence, { baseURL }) {
   const rsp = await axios.get(`${baseURL}/api/augmented_diff?id=${sequence}`, {
-    responseType: "stream"
+    responseType: "stream",
+    timeout: 60e3
   });
 
   rsp.data.sequenceNumber = sequence;
@@ -23,7 +24,6 @@ async function getChange(sequence, { baseURL }) {
 module.exports = options => {
   const opts = {
     baseURL: OVERPASS_URL,
-    checkpoint: () => {},
     delay: 30e3,
     infinite: true,
     ...options
@@ -33,7 +33,9 @@ module.exports = options => {
 
   return _(async (push, next) => {
     try {
-      const nextState = await getMostRecentReplicationSequence({ baseURL: opts.baseURL });
+      const nextState = await getMostRecentReplicationSequence({
+        baseURL: opts.baseURL
+      });
 
       if (state == null || state < 0) {
         try {
@@ -52,8 +54,6 @@ module.exports = options => {
 
         push(null, change);
 
-        opts.checkpoint(state);
-
         state++;
 
         next();
@@ -69,6 +69,21 @@ module.exports = options => {
       return setTimeout(next, opts.delay);
     }
   })
-    .map(s => _(s).append(`<!-- sequenceNumber: ${s.sequenceNumber} -->\n`).append("\u001e"))
+    .map(s => {
+      const startMarker = yaml.dump({
+        status: "start",
+        sequenceNumber: s.sequenceNumber
+      });
+
+      const endMarker = yaml.dump({
+        status: "end",
+        sequenceNumber: s.sequenceNumber
+      });
+
+      return _([`<!--\n${startMarker}\n-->`])
+        .concat(s)
+        .append(`<!--\n${endMarker}\n-->`)
+        .append("\u001e");
+    })
     .sequence();
 };
