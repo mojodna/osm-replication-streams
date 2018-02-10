@@ -127,7 +127,6 @@ module.exports = class AugmentedDiffParser extends Transform {
         oncomment: comment => {
           try {
             const data = yaml.safeLoad(comment);
-            console.log("comment:", data);
 
             if (data.status === "start") {
               this.sequence = data.sequenceNumber;
