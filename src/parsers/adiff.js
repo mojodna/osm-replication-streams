@@ -115,6 +115,7 @@ module.exports = class AugmentedDiffParser extends Transform {
     });
 
     this.sequence = null;
+    this.timestamp = null;
 
     this.createParser();
   }
@@ -130,6 +131,10 @@ module.exports = class AugmentedDiffParser extends Transform {
 
             if (data.status === "start") {
               this.sequence = data.sequenceNumber;
+              // Overpass sequences are minute offsets from 2012-09-12T06:55:00.000Z
+              this.timestamp = new Date(
+                (this.sequence * 60 + 1347432900) * 1000
+              );
               this.emit("sequenceStart", this.sequence);
             }
 
@@ -137,6 +142,7 @@ module.exports = class AugmentedDiffParser extends Transform {
               this.emit("sequenceEnd", this.sequence);
               this.parser.reset();
               this.sequence = null;
+              this.timestamp = null;
             }
 
             // push a marker into the stream
@@ -293,11 +299,16 @@ module.exports = class AugmentedDiffParser extends Transform {
               );
             }
           } else {
-            if (prev.version === next.version) {
+            if (
+              prev.version === next.version ||
+              Date.parse(next.timestamp) < this.timestamp - 60e3
+            ) {
+              // node 35989826 was modified, changing way 5187240, which should show as version 3 before and after
+              // http://overpass-api.de/api/augmented_diff?id=2853595
               this.action = "minorVersion";
 
               // prev.changeset is the last *major* version
-
+              // next.changeset is the current *major* version
               if (next.type === "way") {
                 const changesets = next.nodes
                   // filter out nodes not included in this diff
