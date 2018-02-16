@@ -365,11 +365,17 @@ module.exports = class AugmentedDiffParser extends Transform {
       case "way": {
         const element = this[this.state];
 
-        if (element.nodes.length > 0) {
-          element.nodes = element.nodes.map(
-            n => this.nodes[this.state][n.ref] || n
-          );
-        }
+        element.nodes = element.nodes.map(n => {
+          let node = this.nodes[this.state][n.ref] || n;
+
+          // if the node was deleted, use the old version so we have geometry
+          // information
+          if (this.state === "new" && node.visible === "false") {
+            node = this.nodes.old[n.ref] || n;
+          }
+
+          return node;
+        });
 
         break;
       }
