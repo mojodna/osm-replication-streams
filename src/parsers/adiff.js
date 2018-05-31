@@ -288,16 +288,14 @@ module.exports = class AugmentedDiffParser extends Transform {
         // no support for relations yet
         if (["node", "way"].includes(next.type)) {
           if (prev == null) {
-            if (Object.keys(next.tags).length > 0) {
-              const ng = toGeoJSON("new", next);
-              ng.properties.augmentedDiff = this.sequence;
+            const ng = toGeoJSON("new", next);
+            ng.properties.augmentedDiff = this.sequence;
 
-              this.push(
-                featureCollection([ng], {
-                  id: this.action
-                })
-              );
-            }
+            this.push(
+              featureCollection([ng], {
+                id: this.action
+              })
+            );
           } else {
             if (
               prev.version === next.version ||
@@ -330,20 +328,15 @@ module.exports = class AugmentedDiffParser extends Transform {
               }
             }
 
-            if (
-              Object.keys(prev.tags).length > 0 ||
-              Object.keys(next.tags).length > 0
-            ) {
-              const og = toGeoJSON("old", prev);
-              const ng = toGeoJSON("new", next, prev);
-              ng.properties.augmentedDiff = this.sequence;
+            const og = toGeoJSON("old", prev);
+            const ng = toGeoJSON("new", next, prev);
+            ng.properties.augmentedDiff = this.sequence;
 
-              this.push(
-                featureCollection([og, ng], {
-                  id: this.action
-                })
-              );
-            }
+            this.push(
+              featureCollection([og, ng], {
+                id: this.action
+              })
+            );
           }
         }
 
