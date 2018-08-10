@@ -308,23 +308,27 @@ module.exports = class AugmentedDiffParser extends Transform {
               // prev.changeset is the last *major* version
               // next.changeset is the current *major* version
               if (next.type === "way") {
-                const changesets = next.nodes
+                const nodeMeta = next.nodes
                   // filter out nodes not included in this diff
                   .filter(x => x.timestamp)
                   .sort(
                     (a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp)
-                  )
-                  .map(x => x.changeset);
+                  );
 
-                if (changesets.length === 0) {
+                if (nodeMeta.length === 0) {
                   // see way 17641595 (version 2 -> 3) in
                   // http://overpass-api.de/api/augmented_diff?id=2801986
                   // tags change but the new way doesn't reflect the new version
                   return;
                 }
 
-                // attribute this to the correct changeset
-                next.changeset = changesets.pop();
+                // assign the correct metadata
+                const meta = nodeMeta.pop();
+
+                next.changeset = meta.changeset;
+                next.uid = meta.uid;
+                next.user = meta.user;
+                next.timestamp = meta.timestamp;
               }
             }
 
