@@ -14,6 +14,13 @@ const yaml = require("js-yaml");
 const isClosed = coords => isEqual(coords[0], coords[coords.length - 1]);
 
 const toGeoJSON = (id, element, prev) => {
+  let { tags } = element;
+  const visible = element.visible !== "false";
+
+  if (!visible) {
+    ({ tags } = prev);
+  }
+
   switch (element.type) {
     case "node": {
       let coords = [element.lon, element.lat];
@@ -28,12 +35,13 @@ const toGeoJSON = (id, element, prev) => {
         {
           changeset: element.changeset,
           id: element.id,
-          tags: element.tags,
+          tags,
           timestamp: element.timestamp,
           type: element.type,
           uid: element.uid,
           user: element.user,
-          version: element.version
+          version: element.version,
+          visible
         },
         {
           id
@@ -54,12 +62,13 @@ const toGeoJSON = (id, element, prev) => {
           {
             changeset: element.changeset,
             id: element.id,
-            tags: element.tags,
+            tags,
             timestamp: element.timestamp,
             type: element.type,
             uid: element.uid,
             user: element.user,
-            version: element.version
+            version: element.version,
+            visible
           },
           {
             id
@@ -73,12 +82,13 @@ const toGeoJSON = (id, element, prev) => {
           {
             changeset: element.changeset,
             id: element.id,
-            tags: element.tags,
+            tags,
             timestamp: element.timestamp,
             type: element.type,
             uid: element.uid,
             user: element.user,
-            version: element.version
+            version: element.version,
+            visible
           },
           {
             id
@@ -91,12 +101,13 @@ const toGeoJSON = (id, element, prev) => {
         {
           changeset: element.changeset,
           id: element.id,
-          tags: element.tags,
+          tags,
           timestamp: element.timestamp,
           type: element.type,
           uid: element.uid,
           user: element.user,
-          version: element.version
+          version: element.version,
+          visible
         },
         {
           id
