@@ -198,6 +198,7 @@ module.exports = class AugmentedDiffParser extends Transform {
           old: {},
           new: {}
         };
+        this.nds = {};
 
         break;
 
@@ -264,13 +265,21 @@ module.exports = class AugmentedDiffParser extends Transform {
           case "way": {
             const { ref, lat, lon } = attributes;
 
+            const nd = {
+              ref,
+              lat: lat ? Number(lat) : null,
+              lon: lon ? Number(lon) : null
+            }
+
+            // cache this nd for future use (this is probably in the new version
+            // of the way; some old versions may have null coordinates)
+            if (nd.lat != null && nd.lon != null) {
+              this.nds[nd.ref] = nd;
+            }
+
             element.nodes = [
               ...element.nodes,
-              {
-                ref,
-                lat: Number(lat),
-                lon: Number(lon)
-              }
+              nd
             ];
 
             break;
@@ -299,14 +308,18 @@ module.exports = class AugmentedDiffParser extends Transform {
         // no support for relations yet
         if (["node", "way"].includes(next.type)) {
           if (prev == null) {
-            const ng = toGeoJSON("new", next);
-            ng.properties.augmentedDiff = this.sequence;
+            try {
+              const ng = toGeoJSON("new", next);
+              ng.properties.augmentedDiff = this.sequence;
 
-            this.push(
-              featureCollection([ng], {
-                id: this.action
-              })
-            );
+              this.push(
+                featureCollection([ng], {
+                  id: this.action
+                })
+              );
+            } catch (err) {
+              console.warn(err.stack);
+            }
           } else {
             if (
               prev.version === next.version ||
@@ -343,15 +356,30 @@ module.exports = class AugmentedDiffParser extends Transform {
               }
             }
 
-            const og = toGeoJSON("old", prev);
-            const ng = toGeoJSON("new", next, prev);
-            ng.properties.augmentedDiff = this.sequence;
+            if (prev.type === "way") {
+              // use newer node coordinates if previous coordinates are missing
+              prev.nodes = prev.nodes.map(nd => {
+                if (nd.lat == null || nd.lon == null) {
+                  return this.nds[nd.ref] || nd;
+                }
 
-            this.push(
-              featureCollection([og, ng], {
-                id: this.action
-              })
-            );
+                return nd;
+              });
+            }
+
+            try {
+              const og = toGeoJSON("old", prev);
+              const ng = toGeoJSON("new", next, prev);
+              ng.properties.augmentedDiff = this.sequence;
+
+              this.push(
+                featureCollection([og, ng], {
+                  id: this.action
+                })
+              );
+            } catch (err) {
+              console.warn(err.stack);
+            }
           }
         }
 
