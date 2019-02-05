@@ -329,7 +329,9 @@ module.exports = class AugmentedDiffParser extends Transform {
           if (prev == null) {
             try {
               const ng = toGeoJSON("new", next);
-              ng.properties.augmentedDiff = this.sequence;
+              if (this.sequence != null) {
+                ng.properties.augmentedDiff = this.sequence;
+              }
 
               this.push(
                 featureCollection([ng], {
@@ -378,7 +380,9 @@ module.exports = class AugmentedDiffParser extends Transform {
             try {
               const og = toGeoJSON("old", prev);
               const ng = toGeoJSON("new", next, prev);
-              ng.properties.augmentedDiff = this.sequence;
+              if (this.sequence != null) {
+                ng.properties.augmentedDiff = this.sequence;
+              }
 
               this.push(
                 featureCollection([og, ng], {
