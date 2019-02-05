@@ -56,7 +56,35 @@ const toGeoJSON = (id, element, prev) => {
         coords = prev.nodes.map(x => [x.lon, x.lat]);
       }
 
-      if (isClosed(coords) && isArea(element.tags) && coords.length >= 4) {
+      if (coords.flat().some(x => x == null)) {
+        // invalid geometry
+
+        return {
+          id,
+          type: "Feature",
+          geometry: {
+            type: "GeometryCollection",
+            geometries: []
+          },
+          properties: {
+            changeset: element.changeset,
+            id: element.id,
+            tags,
+            timestamp: element.timestamp,
+            type: element.type,
+            uid: element.uid,
+            user: element.user,
+            version: element.version,
+            visible
+          }
+        };
+      }
+
+      if (
+        isClosed(coords) &&
+        isArea(element.tags) &&
+        coords.length >= 4
+      ) {
         return polygon(
           [coords],
           {
@@ -269,18 +297,9 @@ module.exports = class AugmentedDiffParser extends Transform {
               ref,
               lat: lat ? Number(lat) : null,
               lon: lon ? Number(lon) : null
-            }
+            };
 
-            // cache this nd for future use (this is probably in the new version
-            // of the way; some old versions may have null coordinates)
-            if (nd.lat != null && nd.lon != null) {
-              this.nds[nd.ref] = nd;
-            }
-
-            element.nodes = [
-              ...element.nodes,
-              nd
-            ];
+            element.nodes = [...element.nodes, nd];
 
             break;
           }
@@ -354,17 +373,6 @@ module.exports = class AugmentedDiffParser extends Transform {
                 next.user = meta.user;
                 next.timestamp = meta.timestamp;
               }
-            }
-
-            if (prev.type === "way") {
-              // use newer node coordinates if previous coordinates are missing
-              prev.nodes = prev.nodes.map(nd => {
-                if (nd.lat == null || nd.lon == null) {
-                  return this.nds[nd.ref] || nd;
-                }
-
-                return nd;
-              });
             }
 
             try {
