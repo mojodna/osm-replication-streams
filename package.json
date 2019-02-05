@@ -2,7 +2,7 @@
   "name": "osm-replication-streams",
   "version": "0.6.7",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.3.0"
   },
   "scripts": {
     "build": "babel -d dist src/",
