@@ -56,9 +56,12 @@ const toGeoJSON = (id, element, prev) => {
         coords = prev.nodes.map(x => [x.lon, x.lat]);
       }
 
+      const nds = element.nodes.map(x => x.id || x.ref)
+
       const properties = {
         changeset: element.changeset,
         id: element.id,
+        nds,
         tags,
         timestamp: element.timestamp,
         type: element.type,
