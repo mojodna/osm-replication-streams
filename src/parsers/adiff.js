@@ -56,6 +56,18 @@ const toGeoJSON = (id, element, prev) => {
         coords = prev.nodes.map(x => [x.lon, x.lat]);
       }
 
+      const properties = {
+        changeset: element.changeset,
+        id: element.id,
+        tags,
+        timestamp: element.timestamp,
+        type: element.type,
+        uid: element.uid,
+        user: element.user,
+        version: element.version,
+        visible
+      }
+
       if (coords.flat().some(x => x == null)) {
         // invalid geometry
 
@@ -66,17 +78,7 @@ const toGeoJSON = (id, element, prev) => {
             type: "GeometryCollection",
             geometries: []
           },
-          properties: {
-            changeset: element.changeset,
-            id: element.id,
-            tags,
-            timestamp: element.timestamp,
-            type: element.type,
-            uid: element.uid,
-            user: element.user,
-            version: element.version,
-            visible
-          }
+          properties
         };
       }
 
@@ -85,62 +87,15 @@ const toGeoJSON = (id, element, prev) => {
         isArea(element.tags) &&
         coords.length >= 4
       ) {
-        return polygon(
-          [coords],
-          {
-            changeset: element.changeset,
-            id: element.id,
-            tags,
-            timestamp: element.timestamp,
-            type: element.type,
-            uid: element.uid,
-            user: element.user,
-            version: element.version,
-            visible
-          },
-          {
-            id
-          }
-        );
+        return polygon([coords], properties, { id });
       }
 
       if (coords.length >= 2) {
-        return lineString(
-          coords,
-          {
-            changeset: element.changeset,
-            id: element.id,
-            tags,
-            timestamp: element.timestamp,
-            type: element.type,
-            uid: element.uid,
-            user: element.user,
-            version: element.version,
-            visible
-          },
-          {
-            id
-          }
-        );
+        return lineString(coords, properties, { id });
       }
 
       return point(
-        coords[0],
-        {
-          changeset: element.changeset,
-          id: element.id,
-          tags,
-          timestamp: element.timestamp,
-          type: element.type,
-          uid: element.uid,
-          user: element.user,
-          version: element.version,
-          visible
-        },
-        {
-          id
-        }
-      );
+        coords[0], properties, { id });
     }
 
     default:
