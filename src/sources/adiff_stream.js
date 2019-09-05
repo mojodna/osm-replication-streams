@@ -5,20 +5,30 @@ const yaml = require("js-yaml");
 const OVERPASS_URL = "http://overpass-api.de";
 
 const getMostRecentReplicationSequence = async ({ baseURL }) => {
-  const rsp = await axios.get(`${baseURL}/api/augmented_diff_status`);
+  try {
+    const rsp = await axios.get(`${baseURL}/api/augmented_diff_status`);
 
-  return parseInt(rsp.data, 10);
+    return parseInt(rsp.data, 10);
+  } catch (err) {
+    console.warn(`Failed to get the most recent replication sequence: ${err.message}`);
+    throw err;
+  }
 };
 
 async function getChange(sequence, { baseURL }) {
-  const rsp = await axios.get(`${baseURL}/api/augmented_diff?id=${sequence}`, {
-    responseType: "stream",
-    timeout: 60e3
-  });
+  try {
+    const rsp = await axios.get(`${baseURL}/api/augmented_diff?id=${sequence}`, {
+      responseType: "stream",
+      timeout: 60e3
+    });
 
-  rsp.data.sequenceNumber = sequence;
+    rsp.data.sequenceNumber = sequence;
 
-  return rsp.data;
+    return rsp.data;
+  } catch (err) {
+    console.warn(`Failed to get change ${sequence}: ${err.message}`);
+    throw err;
+  }
 }
 
 module.exports = options => {
