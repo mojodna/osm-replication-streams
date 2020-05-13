@@ -1,0 +1,11 @@
+{
+  "plugins": ["mocha"],
+  "extends": [
+    "plugin:mocha/recommended"
+  ],
+  "rules": {
+    "node/no-unpublished-require": ["error", {
+        "allowModules": ["mocha"]
+    }]
+  }
+}
