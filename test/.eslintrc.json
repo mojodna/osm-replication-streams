@@ -5,7 +5,7 @@
   ],
   "rules": {
     "node/no-unpublished-require": ["error", {
-        "allowModules": ["mocha"]
+        "allowModules": ["chai", "mocha"]
     }]
   }
 }
