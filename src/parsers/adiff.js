@@ -6,10 +6,11 @@ const {
   point,
   polygon
 } = require("@turf/helpers");
+require("array-flat-polyfill");   // Remove when support dropped for Node < 11
 const { Parser } = require("htmlparser2");
 const { isArea } = require("id-area-keys");
-const isEqual = require("lodash.isequal");
 const yaml = require("js-yaml");
+const isEqual = require("lodash.isequal");
 
 const isClosed = coords => isEqual(coords[0], coords[coords.length - 1]);
 
