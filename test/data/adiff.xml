@@ -1,0 +1,119 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API 0.7.56.1004 6cd3eaec">
+<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+<meta osm_base="2020-05-18T15:07:02Z"/>
+
+<action type="modify">
+<old>
+  <node id="360444888" lat="13.2320036" lon="-16.5921061" version="5" timestamp="2019-03-28T12:55:47Z" changeset="68624648" uid="7725447" user="ChadSi"/>
+</old>
+<new>
+  <node id="360444888" lat="13.2305832" lon="-16.5919425" version="6" timestamp="2020-04-22T19:03:51Z" changeset="83958001" uid="9461095" user="yellow_car47"/>
+</new>
+</action>
+
+<action type="modify">
+<old>
+  <node id="412638265" lat="51.9453803" lon="14.7094790" version="2" timestamp="2009-12-13T13:31:38Z" changeset="3362785" uid="163437" user="r-michael"/>
+</old>
+<new>
+  <node id="412638265" lat="51.9453762" lon="14.7096292" version="3" timestamp="2020-04-22T19:03:07Z" changeset="83957981" uid="7549553" user="joe2812"/>
+</new>
+</action>
+
+<action type="modify">
+<old>
+  <node id="412638267" lat="51.9454028" lon="14.7098910" version="2" timestamp="2009-12-13T13:31:37Z" changeset="3362785" uid="163437" user="r-michael"/>
+</old>
+<new>
+  <node id="412638267" lat="51.9453995" lon="14.7099245" version="3" timestamp="2020-04-22T19:03:07Z" changeset="83957981" uid="7549553" user="joe2812"/>
+</new>
+</action>
+
+<action type="create">
+  <node id="7434944955" lat="48.1433570" lon="14.6484835" version="1" timestamp="2020-04-22T19:03:08Z" changeset="83957982" uid="387904" user="flash3"/>
+</action>
+
+<action type="delete">
+<old>
+  <node id="941243822" lat="43.8887198" lon="-0.4983433" version="2" timestamp="2011-03-17T12:11:11Z" changeset="7584727" uid="196035" user="vendangeur">
+    <tag k="amenity" v="bicycle_parking"/>
+    <tag k="capacity" v="2"/>
+    <tag k="source" v="cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2010"/>
+  </node>
+</old>
+<new>
+  <node id="941243822" visible="false" version="3" timestamp="2020-04-22T19:03:53Z" changeset="83958004" uid="10917218" user="ERIC JAOUEN"/>
+</new>
+</action>
+
+<action type="modify">
+<old>
+  <way id="3991402" version="10" timestamp="2018-12-28T18:17:30Z" changeset="65849276" uid="9293412" user="c_parker">
+    <bounds minlat="55.6559921" minlon="12.5655203" maxlat="55.6583041" maxlon="12.5672856"/>
+    <nd ref="20908251" lat="55.6583041" lon="12.5672856"/>
+    <nd ref="295966936" lat="55.6579039" lon="12.5669796"/>
+    <nd ref="4174194536" lat="55.6571978" lon="12.5664295"/>
+    <nd ref="3224267803" lat="55.6569912" lon="12.5661962"/>
+    <nd ref="3835181611" lat="55.6561638" lon="12.5655228"/>
+    <nd ref="2514123543" lat="55.6559921" lon="12.5655203"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="name" v="Islands Brygge"/>
+    <tag k="lit" v="yes"/>
+    <tag k="cycleway" v="lane"/>
+    <tag k="highway" v="residential"/>
+  </way>
+</old>
+<new>
+  <way id="3991402" version="11" timestamp="2020-04-22T19:03:59Z" changeset="83958010" uid="1288" user="Niels Elgaard Larsen">
+    <bounds minlat="55.6559921" minlon="12.5655203" maxlat="55.6583041" maxlon="12.5672856"/>
+    <nd ref="20908251" lat="55.6583041" lon="12.5672856"/>
+    <nd ref="295966936" lat="55.6579039" lon="12.5669796"/>
+    <nd ref="4174194536" lat="55.6571978" lon="12.5664295"/>
+    <nd ref="3224267803" lat="55.6569912" lon="12.5661962"/>
+    <nd ref="3835181611" lat="55.6561638" lon="12.5655228"/>
+    <nd ref="2514123543" lat="55.6559921" lon="12.5655203"/>
+    <tag k="cycleway" v="lane"/>
+    <tag k="highway" v="residential"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="40"/>
+    <tag k="name" v="Islands Brygge"/>
+    <tag k="source:maxspeed" v="sign"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="zone:maxspeed" v="DK:40"/>
+  </way>
+</new>
+</action>
+
+<action type="delete">
+<old>
+  <way id="237175249" version="3" timestamp="2015-07-10T22:06:30Z" changeset="32554676" uid="2944054" user="Kathryn Killebrew">
+    <bounds minlat="39.9692529" minlon="-75.1947419" maxlat="39.9721712" maxlon="-75.1931066"/>
+    <nd ref="2471669260" lat="39.9692529" lon="-75.1931066"/>
+    <nd ref="881813629" lat="39.9699974" lon="-75.1934227"/>
+    <nd ref="881813631" lat="39.9707878" lon="-75.1937545"/>
+    <nd ref="881813636" lat="39.9714024" lon="-75.1940120"/>
+    <nd ref="881813640" lat="39.9721712" lon="-75.1943312"/>
+    <nd ref="881813645" lat="39.9720966" lon="-75.1947419"/>
+    <tag k="bicycle" v="no"/>
+    <tag k="highway" v="footway"/>
+  </way>
+</old>
+<new>
+  <way id="237175249" visible="false" version="4" timestamp="2020-04-22T19:03:23Z" changeset="83957990" uid="381909" user="JessAk71"/>
+</new>
+</action>
+
+<action type="create">
+  <way id="794917889" version="1" timestamp="2020-04-22T19:03:01Z" changeset="83957974" uid="568608" user="JohnGovDocs">
+    <bounds minlat="-9.4466185" minlon="33.0194927" maxlat="-9.4465797" maxlon="33.0195312"/>
+    <nd ref="7434996383" lat="-9.4465797" lon="33.0195118"/>
+    <nd ref="7434996384" lat="-9.4466033" lon="33.0194927"/>
+    <nd ref="7435019185" lat="-9.4466185" lon="33.0195121"/>
+    <nd ref="7435019186" lat="-9.4465949" lon="33.0195312"/>
+    <nd ref="7434996383" lat="-9.4465797" lon="33.0195118"/>
+    <tag k="building" v="yes"/>
+  </way>
+</action>
+</osm>

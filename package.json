@@ -6,7 +6,8 @@
   },
   "scripts": {
     "build": "babel -d dist src/",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test": "mocha"
   },
   "description": "",
   "main": "dist/index.js",
@@ -14,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@turf/helpers": "^6.1.4",
+    "array-flat-polyfill": "^1.0.1",
     "async": "^2.6.2",
     "aws-sdk": "^2.446.0",
     "axios": "^0.18.0",
@@ -33,11 +35,14 @@
     "@babel/core": "^7.4.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
+    "chai": "^4.2.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-mocha": "^6.3.0",
     "eslint-plugin-node": "^8.0.1",
-    "eslint-plugin-promise": "^4.1.1"
+    "eslint-plugin-promise": "^4.1.1",
+    "mocha": "^7.1.2"
   }
 }
