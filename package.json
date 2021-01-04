@@ -16,7 +16,7 @@
     "@turf/helpers": "^6.1.4",
     "async": "^2.6.2",
     "aws-sdk": "^2.446.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "epipebomb": "^1.0.0",
     "highland": "^2.13.4",
     "htmlparser2": "^3.10.1",
